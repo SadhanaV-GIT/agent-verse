@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import Chatbot from './Chatbot'
 import { 
   LogOut, Github, Settings, LayoutDashboard, GitPullRequest, User,
   Bell, Plus, Inbox, ChevronDown, Sun, Moon, GitBranch, FileCode2, BarChart3, BookOpen
@@ -67,6 +68,9 @@ export default function Layout() {
       <main className="flex-1 w-full max-w-[1280px] mx-auto p-8 relative">
         <Outlet />
       </main>
+
+      {/* Global AI Chatbox */}
+      <Chatbot />
     </div>
   )
 }
