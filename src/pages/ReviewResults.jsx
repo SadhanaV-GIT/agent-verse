@@ -58,17 +58,17 @@ export default function ReviewResults() {
   if (loading) return (
     <div className="flex items-center justify-center min-h-96">
       <div className="text-center">
-        <div className="w-10 h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-400 text-sm">Loading review results…</p>
+        <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-tx-secondary text-sm">Loading review results…</p>
       </div>
     </div>
   )
 
   if (error) return (
     <div className="glass-card p-8 text-center">
-      <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-      <h2 className="text-white font-semibold mb-2">Failed to load results</h2>
-      <p className="text-slate-400 text-sm">{error}</p>
+      <AlertTriangle className="w-10 h-10 text-[var(--severity-critical)] mx-auto mb-3" />
+      <h2 className="text-tx-primary font-semibold mb-2">Failed to load results</h2>
+      <p className="text-tx-secondary text-sm">{error}</p>
     </div>
   )
 
@@ -76,13 +76,13 @@ export default function ReviewResults() {
     <div className="animate-fade-in">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <div className="flex items-center gap-2 text-slate-500 text-xs mb-2">
-            <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+          <div className="flex items-center gap-2 text-tx-tertiary text-xs mb-2">
+            <Link to="/dashboard" className="hover:text-tx-primary transition-colors">Dashboard</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="font-mono text-slate-400">{prId}</span>
+            <span className="font-mono text-tx-secondary">{prId}</span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-1">Review Results</h1>
-          <p className="text-slate-400 text-sm">{allIssues.length} total issues from Agents 1 &amp; 2</p>
+          <h1 className="text-3xl font-bold text-tx-primary mb-1">Review Results</h1>
+          <p className="text-tx-secondary text-sm">{allIssues.length} total issues from Agents 1 &amp; 2</p>
         </div>
         <div className="flex items-center gap-2">
           <Link to={`/explain/${prId}`} className="btn-secondary text-sm">
@@ -99,15 +99,15 @@ export default function ReviewResults() {
 
       {/* Summary pills */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        {summary.critical > 0 && <StatPill label="Critical" count={summary.critical} color="bg-red-500/10 border-red-500/30 text-red-400" />}
-        {summary.high > 0 && <StatPill label="High" count={summary.high} color="bg-orange-500/10 border-orange-500/30 text-orange-400" />}
-        {summary.medium > 0 && <StatPill label="Medium" count={summary.medium} color="bg-yellow-500/10 border-yellow-500/30 text-yellow-400" />}
-        {summary.low > 0 && <StatPill label="Low" count={summary.low} color="bg-blue-500/10 border-blue-500/30 text-blue-400" />}
-        {summary.info > 0 && <StatPill label="Info" count={summary.info} color="bg-slate-500/10 border-slate-500/30 text-slate-400" />}
+        {summary.critical > 0 && <StatPill label="Critical" count={summary.critical} color="bg-[var(--severity-critical-bg)] border-[var(--severity-critical-border)] text-[var(--severity-critical)]" />}
+        {summary.high > 0 && <StatPill label="High" count={summary.high} color="bg-[var(--severity-high-bg)] border-[var(--severity-high-border)] text-[var(--severity-high)]" />}
+        {summary.medium > 0 && <StatPill label="Medium" count={summary.medium} color="bg-[var(--severity-medium-bg)] border-[var(--severity-medium-border)] text-[var(--severity-medium)]" />}
+        {summary.low > 0 && <StatPill label="Low" count={summary.low} color="bg-[var(--severity-low-bg)] border-[var(--severity-low-border)] text-[var(--severity-low)]" />}
+        {summary.info > 0 && <StatPill label="Info" count={summary.info} color="bg-bg-elevated border-border-default text-tx-secondary" />}
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-dark-900 rounded-xl mb-6 w-fit">
+      <div className="flex items-center gap-1 p-1 bg-bg-elevated rounded-xl mb-6 w-fit border border-border-default">
         {[
           { id: 'all', label: `All (${allIssues.length})` },
           { id: 'static', label: `Static Analysis (${staticIssues.length})`, icon: Code2 },
@@ -117,7 +117,7 @@ export default function ReviewResults() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-              activeTab === tab.id ? 'bg-brand-600/30 text-brand-300 shadow-sm' : 'text-slate-500 hover:text-white'
+              activeTab === tab.id ? 'bg-bg-base text-tx-primary shadow-sm border border-border-default' : 'text-tx-secondary hover:text-tx-primary'
             }`}
           >
             {tab.icon && <tab.icon className="w-3.5 h-3.5" />}
@@ -130,7 +130,7 @@ export default function ReviewResults() {
       <div className="space-y-3">
         {filteredIssues.length === 0 ? (
           <div className="glass-card p-10 text-center">
-            <div className="text-slate-400">No issues found in this category 🎉</div>
+            <div className="text-tx-secondary">No issues found in this category 🎉</div>
           </div>
         ) : (
           filteredIssues.map((issue) => (

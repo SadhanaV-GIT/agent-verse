@@ -3,46 +3,90 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --bg-base: #03000A; /* Deep Cyber Void */
-    --bg-elevated: rgba(30, 20, 50, 0.4); 
-    --bg-elevated-2: rgba(40, 30, 70, 0.5);
-    --bg-hover: rgba(50, 40, 90, 0.5);
+  /* GitHub Light Mode (Default) */
+  :root, :root.light {
+    --bg-base: #ffffff; 
+    --bg-elevated: #f6f8fa; 
+    --bg-elevated-2: #eaeef2;
+    --bg-hover: #f3f4f6;
 
-    --border-subtle: rgba(255, 255, 255, 0.05);
-    --border-default: rgba(255, 255, 255, 0.12);
-    --border-strong: rgba(255, 255, 255, 0.25);
+    --border-subtle: #eaeef2;
+    --border-default: #d0d7de;
+    --border-strong: #8b949e;
 
-    --text-primary: #FFFFFF;
-    --text-secondary: #B4B4CF;
-    --text-tertiary: #7D7D9A;
-    --text-quaternary: #4D4D69;
+    --text-primary: #1f2328;
+    --text-secondary: #59636e;
+    --text-tertiary: #656d76;
+    --text-quaternary: #8c959f;
 
-    --accent: #D946EF; /* Neon Magenta */
-    --accent-hover: #F0ABFC;
-    --accent-text: #050211;
-    --accent-signature: #06B6D4; /* Electric Cyan */
+    --accent: #1f883d;
+    --accent-hover: #1a7f37;
+    --accent-text: #ffffff;
+    --accent-signature: #0969da;
 
-    --brand-gradient: linear-gradient(135deg, #D946EF 0%, #7C3AED 40%, #06B6D4 100%);
+    --brand-gradient: linear-gradient(135deg, #1f883d 0%, #1a7f37 100%);
 
-    --severity-critical: #EF4444;
-    --severity-critical-bg: rgba(239, 68, 68, 0.15);
-    --severity-critical-border: rgba(239, 68, 68, 0.50);
+    --severity-critical: #cf222e;
+    --severity-critical-bg: rgba(207,34,46,0.1);
+    --severity-critical-border: rgba(207,34,46,0.4);
 
-    --severity-high: #F97316;
-    --severity-high-bg: rgba(249, 115, 22, 0.15);
-    --severity-high-border: rgba(249, 115, 22, 0.50);
+    --severity-high: #9a6700;
+    --severity-high-bg: rgba(154,103,0,0.1);
+    --severity-high-border: rgba(154,103,0,0.4);
 
-    --severity-medium: #EAB308;
-    --severity-medium-bg: rgba(234, 179, 8, 0.15);
-    --severity-medium-border: rgba(234, 179, 8, 0.50);
+    --severity-medium: #9a6700;
+    --severity-medium-bg: rgba(154,103,0,0.1);
+    --severity-medium-border: rgba(154,103,0,0.4);
 
-    --severity-low: #06B6D4;
-    --severity-low-bg: rgba(6, 182, 212, 0.15);
-    --severity-low-border: rgba(6, 182, 212, 0.50);
+    --severity-low: #0969da;
+    --severity-low-bg: rgba(9,105,218,0.1);
+    --severity-low-border: rgba(9,105,218,0.4);
 
-    --severity-success: #10B981;
-    --severity-success-bg: rgba(16, 185, 129, 0.15);
+    --severity-success: #1f883d;
+    --severity-success-bg: rgba(31,136,61,0.1);
+  }
+
+  /* GitHub Dark Mode */
+  :root.dark {
+    --bg-base: #0d1117; 
+    --bg-elevated: #161b22; 
+    --bg-elevated-2: #21262d;
+    --bg-hover: #1f2428;
+
+    --border-subtle: #21262d;
+    --border-default: #30363d;
+    --border-strong: #8b949e;
+
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --text-tertiary: #8b949e;
+    --text-quaternary: #484f58;
+
+    --accent: #238636;
+    --accent-hover: #2ea043;
+    --accent-text: #ffffff;
+    --accent-signature: #58a6ff;
+
+    --brand-gradient: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+
+    --severity-critical: #f85149;
+    --severity-critical-bg: rgba(248,81,73,0.1);
+    --severity-critical-border: rgba(248,81,73,0.4);
+
+    --severity-high: #d29922;
+    --severity-high-bg: rgba(210,153,34,0.1);
+    --severity-high-border: rgba(210,153,34,0.4);
+
+    --severity-medium: #d29922;
+    --severity-medium-bg: rgba(210,153,34,0.1);
+    --severity-medium-border: rgba(210,153,34,0.4);
+
+    --severity-low: #58a6ff;
+    --severity-low-bg: rgba(88,166,255,0.1);
+    --severity-low-border: rgba(88,166,255,0.4);
+
+    --severity-success: #3fb950;
+    --severity-success-bg: rgba(63,185,80,0.1);
   }
 
   * {
@@ -66,39 +110,19 @@
 }
 
 @layer components {
-  /* Extreme Holographic Glassmorphism */
+  /* Flat GitHub Panels */
   .glass-card {
-    @apply relative overflow-hidden rounded-2xl transition-all duration-300;
-    background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%);
-    backdrop-filter: blur(32px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.25);
-    border-left: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255,255,255,0.02);
+    @apply relative overflow-hidden rounded-md transition-all duration-200;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
   }
   .glass-card:hover {
-    background: linear-gradient(145deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.02) 100%);
-    border-top: 1px solid rgba(255,255,255,0.4);
-    border-left: 1px solid rgba(255,255,255,0.25);
-    box-shadow: 0 16px 48px 0 rgba(124, 58, 237, 0.25), inset 0 0 0 1px rgba(255,255,255,0.05);
+    border-color: var(--border-strong);
   }
 
-  /* Cyber Grid Background */
+  /* Cyber Grid Background (Disabled) */
   .bg-cyber-grid {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background-size: 80px 80px;
-    background-image: 
-      linear-gradient(to right, rgba(124, 58, 237, 0.08) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(124, 58, 237, 0.08) 1px, transparent 1px);
-    pointer-events: none;
-  }
-  .bg-cyber-grid::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, transparent 20%, #03000A 90%);
+    display: none;
   }
 
   /* Noise Overlay */

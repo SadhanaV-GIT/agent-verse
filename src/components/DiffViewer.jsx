@@ -24,7 +24,7 @@ export default function DiffViewer({ suggestion }) {
 
   if (!suggestion.diff && !suggestion.originalCode) {
     return (
-      <div className="code-block p-4 text-slate-400 text-sm">
+      <div className="code-block p-4 text-tx-tertiary text-sm">
         No diff available for this suggestion.
       </div>
     )
@@ -35,15 +35,15 @@ export default function DiffViewer({ suggestion }) {
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <button onClick={() => setView('diff')} className={`text-xs px-3 py-1 rounded-lg transition-colors ${view === 'diff' ? 'bg-brand-600/30 text-brand-300' : 'text-slate-500 hover:text-white'}`}>
+          <button onClick={() => setView('diff')} className={`text-xs px-3 py-1 rounded-lg transition-colors ${view === 'diff' ? 'bg-bg-elevated text-tx-primary border border-border-default' : 'text-tx-secondary hover:text-tx-primary'}`}>
             Diff View
           </button>
-          <button onClick={() => setView('side')} className={`text-xs px-3 py-1 rounded-lg transition-colors ${view === 'side' ? 'bg-brand-600/30 text-brand-300' : 'text-slate-500 hover:text-white'}`}>
+          <button onClick={() => setView('side')} className={`text-xs px-3 py-1 rounded-lg transition-colors ${view === 'side' ? 'bg-bg-elevated text-tx-primary border border-border-default' : 'text-tx-secondary hover:text-tx-primary'}`}>
             Side by Side
           </button>
         </div>
-        <button onClick={handleCopy} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors">
-          {copied ? <Check className="w-3.5 h-3.5 text-accent-400" /> : <Copy className="w-3.5 h-3.5" />}
+        <button onClick={handleCopy} className="flex items-center gap-1.5 text-xs text-tx-tertiary hover:text-tx-primary transition-colors">
+          {copied ? <Check className="w-3.5 h-3.5 text-[var(--severity-success)]" /> : <Copy className="w-3.5 h-3.5" />}
           {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
@@ -61,14 +61,14 @@ export default function DiffViewer({ suggestion }) {
       ) : (
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <div className="text-xs text-red-400 font-medium mb-1 px-1">Before</div>
-            <div className="code-block p-3 text-xs font-mono text-red-300 overflow-x-auto whitespace-pre">
+            <div className="text-xs text-[var(--severity-critical)] font-medium mb-1 px-1">Before</div>
+            <div className="code-block p-3 text-xs font-mono text-tx-primary overflow-x-auto whitespace-pre">
               {suggestion.originalCode || ''}
             </div>
           </div>
           <div>
-            <div className="text-xs text-green-400 font-medium mb-1 px-1">After</div>
-            <div className="code-block p-3 text-xs font-mono text-green-300 overflow-x-auto whitespace-pre">
+            <div className="text-xs text-[var(--severity-success)] font-medium mb-1 px-1">After</div>
+            <div className="code-block p-3 text-xs font-mono text-tx-primary overflow-x-auto whitespace-pre">
               {suggestion.refactoredCode || ''}
             </div>
           </div>

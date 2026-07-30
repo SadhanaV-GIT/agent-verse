@@ -4,8 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { staticAPI, architectureAPI, explainerAPI, refactorAPI, progressAPI, reportAPI } from '../api/agentAPI'
 import AgentPipelineStatus from '../components/AgentPipelineStatus'
 import toast from 'react-hot-toast'
-import { Upload, Plus, Trash2, Play, FileCode2, ChevronRight, Terminal } from 'lucide-react'
-import { GlitchText } from '../components/CyberGlow'
+import { Upload, Plus, Trash2, Play, FileCode2, ChevronRight, Terminal, GitBranch, GitMerge } from 'lucide-react'
 
 const SAMPLE_CODE = `// Sample JavaScript file with intentional issues
 function getUserData(userId) {
@@ -72,28 +71,23 @@ export default function SubmitPR() {
     setCurrentPrId(prId)
 
     try {
-      // Agent 1 — Static Analysis
       setAgentStatus(1, 'running')
       const a1 = await staticAPI.analyze(prId, prTitle, validFiles)
       setAgentStatus(1, 'done')
 
-      // Agent 2 — Architecture Review
       setAgentStatus(2, 'running')
       const a2 = await architectureAPI.review(prId, validFiles)
       setAgentStatus(2, 'done')
 
-      // Combine all issues for downstream agents
       const allIssues = [
         ...(a1.issues || []).map((i) => ({ ...i, sourceAgent: 'agent1' })),
         ...(a2.issues || []).map((i) => ({ ...i, sourceAgent: 'agent2' })),
       ]
 
-      // Agent 3 — Explainer (feed combined issues)
       setAgentStatus(3, 'running')
       await explainerAPI.explain(prId, allIssues)
       setAgentStatus(3, 'done')
 
-      // Agent 4 — Refactor (feed combined findings with file content)
       setAgentStatus(4, 'running')
       const findingsWithContext = allIssues.map((issue) => {
         const file = validFiles.find((f) => f.path === issue.filePath)
@@ -102,19 +96,16 @@ export default function SubmitPR() {
       await refactorAPI.suggest(prId, findingsWithContext)
       setAgentStatus(4, 'done')
 
-      // Agent 5 — Progress Tracking
       setAgentStatus(5, 'running')
       const developerId = user.id || user._id?.toString() || user.email
       await progressAPI.update(developerId, user.name, prId, new Date().toISOString(), allIssues)
       setAgentStatus(5, 'done')
 
-      // Agent 6 — Report
       setAgentStatus(6, 'running')
       await reportAPI.generate(prId, prTitle, user.name)
       setAgentStatus(6, 'done')
 
-      // Save to local history
-      const prs = JSON.parse(localStorage.getItem('devmentor_prs') || '[]')
+      const prs = JSON.parse(localStorage.getItem(`devmentor_prs_${developerId}`) || '[]')
       const topSeverity = allIssues.find((i) => i.severity === 'critical')?.severity ||
                           allIssues.find((i) => i.severity === 'high')?.severity ||
                           allIssues[0]?.severity
@@ -123,12 +114,11 @@ export default function SubmitPR() {
         issueCount: allIssues.length, criticalCount: allIssues.filter((i) => i.severity === 'critical').length,
         severity: topSeverity,
       })
-      localStorage.setItem('devmentor_prs', JSON.stringify(prs))
+      localStorage.setItem(`devmentor_prs_${developerId}`, JSON.stringify(prs))
 
-      toast.success('All 6 agents completed! 🎉')
+      toast.success('Pull request analyzed successfully.')
       setTimeout(() => navigate(`/report/${prId}`), 800)
     } catch (error) {
-      // Find which agent failed
       const failedAgent = Object.entries(agentStatuses).find(([, s]) => s === 'running')?.[0]
       if (failedAgent) setAgentStatus(Number(failedAgent), 'error')
       toast.error(error?.message || 'Analysis failed. Check that all agents are running.')
@@ -138,101 +128,118 @@ export default function SubmitPR() {
   }
 
   return (
-    <div className="animate-fade-in relative z-10">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold font-display uppercase tracking-widest text-white mb-2"><GlitchText text="EXECUTE ANALYSIS" /></h1>
-        <p className="text-tx-secondary text-sm font-mono tracking-wide">
-          <Terminal className="w-4 h-4 inline mr-2 text-accent-signature" />
-          Mount a new pull request into the Swarm for multi-agent evaluation.
-        </p>
+    <div className="w-full text-tx-primary pb-16">
+      <div className="mb-6 flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-border-default pb-6">
+        <div>
+          <h1 className="text-[32px] font-medium text-tx-primary mb-2 tracking-tight">Open a pull request</h1>
+          <p className="text-tx-secondary text-sm">Create a new pull request by comparing changes across files.</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Form */}
-        <div className="lg:col-span-2 space-y-5">
-          <div className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-sm font-medium text-white">PR Details</label>
-              <button type="button" onClick={useSample} className="text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1 transition-colors">
-                <FileCode2 className="w-3.5 h-3.5" /> Load Sample Code
-              </button>
-            </div>
-            <input
-              id="pr-title"
-              type="text"
-              value={prTitle}
-              onChange={(e) => setPrTitle(e.target.value)}
-              className="input"
-              placeholder="e.g. Feature: Add user authentication"
-            />
-          </div>
+      <div className="flex items-center gap-2 mb-6 text-sm bg-bg-elevated border border-border-default rounded-md px-4 py-3 text-tx-secondary">
+        <GitBranch className="w-4 h-4 text-tx-primary" />
+        <span className="bg-bg-hover px-2 py-0.5 rounded-md border border-border-strong text-tx-primary font-mono text-xs">base: main</span>
+        <span className="mx-1">←</span>
+        <span className="bg-bg-hover px-2 py-0.5 rounded-md border border-border-strong text-tx-primary font-mono text-xs">compare: feature-branch</span>
+      </div>
 
-          {/* Files */}
-          <div className="glass-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-white">Code Files</h3>
-              <button type="button" onClick={addFile} className="btn-ghost text-xs gap-1.5">
-                <Plus className="w-3.5 h-3.5" /> Add File
-              </button>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 space-y-4">
+          <div className="flex gap-4">
+            <div className="hidden md:flex w-12 h-12 rounded-full border border-border-default overflow-hidden items-center justify-center bg-bg-elevated text-lg font-bold text-tx-secondary flex-shrink-0">
+              {user?.name?.[0]?.toUpperCase() || 'U'}
             </div>
-
-            <div className="space-y-4">
-              {files.map((file, idx) => (
-                <div key={idx} className="border border-white/5 rounded-xl overflow-hidden">
-                  <div className="flex items-center gap-2 bg-dark-900/60 px-3 py-2 border-b border-white/5">
-                    <FileCode2 className="w-3.5 h-3.5 text-slate-500" />
-                    <input
-                      type="text"
-                      value={file.path}
-                      onChange={(e) => updateFile(idx, 'path', e.target.value)}
-                      className="flex-1 bg-transparent text-xs font-mono text-slate-300 focus:outline-none placeholder-slate-600"
-                      placeholder="src/example.js"
-                    />
-                    {files.length > 1 && (
-                      <button type="button" onClick={() => removeFile(idx)} className="text-slate-600 hover:text-red-400 transition-colors">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  <textarea
-                    value={file.content}
-                    onChange={(e) => updateFile(idx, 'content', e.target.value)}
-                    className="w-full bg-transparent font-mono text-xs text-slate-300 p-3 focus:outline-none resize-none placeholder-slate-700 min-h-[200px]"
-                    placeholder="// Paste your code here..."
-                    spellCheck={false}
-                  />
+            
+            <div className="flex-1 bg-bg-base border border-border-default rounded-md flex flex-col pt-2 relative shadow-sm transition-all duration-300 hover:shadow-md">
+              <div className="absolute top-4 -left-[9px] hidden md:block">
+                <div className="w-4 h-4 bg-bg-base border-l border-t border-border-default transform -rotate-45"></div>
+              </div>
+              
+              <div className="px-4 pb-2 border-b border-border-default flex justify-between items-center bg-bg-base z-10 rounded-t-md">
+                <div className="flex gap-4">
+                  <span className="text-sm font-semibold text-tx-primary px-2 py-1 border-b-2 border-[#fd8c73]">Write</span>
                 </div>
-              ))}
+                <button type="button" onClick={useSample} className="text-xs text-accent-signature hover:underline">
+                  Load sample
+                </button>
+              </div>
+              
+              <div className="bg-bg-elevated p-2">
+                <input
+                  type="text"
+                  value={prTitle}
+                  onChange={(e) => setPrTitle(e.target.value)}
+                  className="w-full px-3 py-2 bg-bg-base border border-border-default rounded-md text-sm text-tx-primary focus:outline-none focus:ring-2 focus:ring-[rgba(88,166,255,0.3)] focus:border-accent-signature transition-all mb-4"
+                  placeholder="Title"
+                />
+                
+                <div className="space-y-4">
+                  {files.map((file, idx) => (
+                    <div key={idx} className="border border-border-default rounded-md overflow-hidden bg-bg-base">
+                      <div className="flex items-center gap-2 bg-bg-hover px-3 py-2 border-b border-border-default">
+                        <FileCode2 className="w-4 h-4 text-tx-secondary" />
+                        <input
+                          type="text"
+                          value={file.path}
+                          onChange={(e) => updateFile(idx, 'path', e.target.value)}
+                          className="flex-1 bg-transparent text-xs font-mono text-tx-primary focus:outline-none"
+                          placeholder="path/to/file.js"
+                        />
+                        {files.length > 1 && (
+                          <button type="button" onClick={() => removeFile(idx)} className="text-tx-secondary hover:text-severity-critical transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      <textarea
+                        value={file.content}
+                        onChange={(e) => updateFile(idx, 'content', e.target.value)}
+                        className="w-full bg-bg-base font-mono text-xs text-tx-primary p-3 focus:outline-none resize-y min-h-[200px]"
+                        placeholder="// Add your code changes here..."
+                        spellCheck={false}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-bg-elevated border-t border-border-default p-3 flex justify-between items-center rounded-b-md">
+                <button type="button" onClick={addFile} className="text-sm font-medium text-tx-primary bg-bg-hover border border-border-default hover:bg-[#30363d] px-3 py-1.5 rounded-md flex items-center gap-2 transition-colors">
+                  <Plus className="w-4 h-4" /> Add file
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={running}
+                  className="bg-accent hover:bg-accent-hover text-accent-text px-6 py-2 rounded-md text-sm font-semibold shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md flex items-center gap-2 disabled:opacity-50 border border-[rgba(240,246,252,0.1)]"
+                >
+                  {running ? (
+                    <><div className="w-4 h-4 border-2 border-[var(--accent-text)] opacity-30 border-t-[var(--accent-text)] rounded-full animate-spin" /> Processing...</>
+                  ) : (
+                    <><GitMerge className="w-4 h-4" /> Create pull request</>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-
-          <button
-            id="run-pipeline-btn"
-            type="button"
-            onClick={handleSubmit}
-            disabled={running}
-            className="btn-primary w-full py-4 text-base gap-3"
-          >
-            {running ? (
-              <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Running Pipeline...</>
-            ) : (
-              <><Play className="w-5 h-5" /> Run 6-Agent Analysis</>
-            )}
-          </button>
         </div>
-
-        {/* Pipeline Status */}
-        <div className="space-y-4">
+        
+        {/* Sidebar Status */}
+        <div className="lg:col-span-1">
           <AgentPipelineStatus agentStatuses={agentStatuses} />
-          <div className="glass-card p-5">
-            <h4 className="text-sm font-medium text-white mb-3">How it works</h4>
-            <div className="space-y-2.5">
-              {['Paste code for any language', 'All 6 agents run sequentially', 'Results appear per-agent in real time', 'Get mentor explanations + diffs', 'Track your growth over time'].map((step, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs text-slate-400">
-                  <div className="w-5 h-5 rounded-full bg-brand-600/20 border border-brand-500/30 text-brand-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">{i + 1}</div>
-                  {step}
-                </div>
-              ))}
+          <div className="mt-6 text-xs text-tx-secondary space-y-4">
+            <h4 className="font-semibold text-tx-primary mb-2 border-b border-border-default pb-2">Swarm Active Reviewers</h4>
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-bg-elevated transition-colors cursor-default">
+              <span className="w-2 h-2 rounded-full bg-[var(--severity-critical)] shadow-[0_0_8px_var(--severity-critical)]"></span> Static Analysis Agent
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-bg-elevated transition-colors cursor-default">
+              <span className="w-2 h-2 rounded-full bg-[var(--severity-high)] shadow-[0_0_8px_var(--severity-high)]"></span> Architecture Agent
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-bg-elevated transition-colors cursor-default">
+              <span className="w-2 h-2 rounded-full bg-[var(--severity-low)] shadow-[0_0_8px_var(--severity-low)]"></span> Security & Explainer
+            </div>
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-bg-elevated transition-colors cursor-default">
+              <span className="w-2 h-2 rounded-full bg-[var(--severity-success)] shadow-[0_0_8px_var(--severity-success)]"></span> Refactor Agent
             </div>
           </div>
         </div>

@@ -17,7 +17,7 @@ const CHART_COLORS = ['#D946EF', '#10b981', '#f97316', '#ef4444', '#eab308', '#0
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-black/90 border border-white/10 rounded-xl p-3 text-xs shadow-[0_0_15px_rgba(217,70,239,0.2)]">
+    <div className="bg-bg-elevated border border-border-default rounded-xl p-3 text-xs shadow-sm">
       <p className="text-tx-secondary mb-1 font-mono uppercase tracking-widest">{label}</p>
       {payload.map((p) => (
         <p key={p.name} style={{ color: p.color }} className="font-bold font-mono">{p.name}: {p.value}</p>
@@ -53,11 +53,11 @@ export default function ProgressDashboard() {
   )
 
   if (error || !data || !data.developer) return (
-    <div className="glass-card p-10 text-center">
+    <div className="glass-card p-10 text-center text-tx-primary">
       <Activity className="w-10 h-10 text-tx-secondary mx-auto mb-3 animate-pulse" />
-      <h2 className="text-white font-bold mb-2 font-display uppercase tracking-widest">No Telemetry Detected</h2>
+      <h2 className="font-bold mb-2 font-display uppercase tracking-widest">No Telemetry Detected</h2>
       <p className="text-tx-tertiary text-sm mb-5 font-mono">Execute a PR analysis to begin indexing your neural growth.</p>
-      <Link to="/submit" className="btn-primary">Initiate Review Cycle</Link>
+      <Link to="/submit" className="btn-primary text-white">Initiate Review Cycle</Link>
     </div>
   )
 
@@ -84,9 +84,9 @@ export default function ProgressDashboard() {
 
   return (
     <div className="animate-fade-in relative z-10">
-      <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-4 border-b border-border-default pb-6">
         <div>
-          <h1 className="text-4xl font-bold text-white font-display uppercase tracking-widest leading-none mb-2"><GlitchText text="NEURAL GROWTH METRICS" /></h1>
+          <h1 className="text-3xl font-bold text-tx-primary tracking-tight leading-none mb-2">Neural Growth Metrics</h1>
           <p className="text-tx-secondary mt-1 font-mono text-sm tracking-wide">
             <Terminal className="w-4 h-4 inline mr-2 text-accent-signature" />
             Analyzing telemetry for: <span className="text-accent uppercase font-bold">{developer.developerName}</span> ({developer.totalPRsReviewed} cycles)
@@ -102,13 +102,13 @@ export default function ProgressDashboard() {
           { label: 'Growth Score', value: `${Math.round(growthScore)}%`, icon: Award, color: 'from-accent-500 to-accent-600' },
           { label: 'Trend', value: growthTrend === 'improving' ? '↓ Improving' : growthTrend === 'declining' ? '↑ Watch out' : '→ Stable', icon: TrendingUp, color: growthTrend === 'improving' ? 'from-green-500 to-green-700' : 'from-amber-500 to-amber-700' },
         ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="glass-card p-5 flex items-center gap-4">
+          <div key={label} className="glass-card p-5 flex items-center gap-4 border border-border-default hover:border-border-strong transition-colors cursor-default">
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center flex-shrink-0`}>
               <Icon className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="text-xl font-bold text-white">{value}</div>
-              <div className="text-xs text-slate-400">{label}</div>
+              <div className="text-xl font-bold text-tx-primary">{value}</div>
+              <div className="text-xs text-tx-secondary">{label}</div>
             </div>
           </div>
         ))}
@@ -117,67 +117,67 @@ export default function ProgressDashboard() {
       {/* Growth Score bar */}
       <div className="glass-card p-6 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-white text-sm">Growth Score</h3>
-          <span className="text-2xl font-bold text-accent-400">{Math.round(growthScore)}%</span>
+          <h3 className="font-semibold text-tx-primary text-sm">Growth Score</h3>
+          <span className="text-2xl font-bold text-tx-primary">{Math.round(growthScore)}%</span>
         </div>
-        <div className="h-3 bg-dark-800 rounded-full overflow-hidden">
+        <div className="h-3 bg-border-default rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-1000"
-            style={{ width: `${growthScore}%`, background: 'linear-gradient(90deg, #6366f1, #10b981)' }}
+            style={{ width: `${growthScore}%`, background: 'linear-gradient(90deg, #0969da, #1f883d)' }}
           />
         </div>
-        <p className="text-xs text-slate-500 mt-2">Based on average issues per PR. Higher = fewer recurring mistakes.</p>
+        <p className="text-xs text-tx-tertiary mt-2">Based on average issues per PR. Higher = fewer recurring mistakes.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Issues over time */}
         <div className="glass-card p-6">
-          <h3 className="font-semibold text-white text-sm mb-5">Issues Per PR Over Time</h3>
+          <h3 className="font-semibold text-tx-primary text-sm mb-5">Issues Per PR Over Time</h3>
           {trendChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={trendChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
+                <XAxis dataKey="name" tick={{ fill: 'var(--text-tertiary)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: 'var(--text-tertiary)', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Line type="monotone" dataKey="issues" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 4 }} activeDot={{ r: 6, fill: '#818cf8' }} />
+                <Line type="monotone" dataKey="issues" stroke="#0969da" strokeWidth={2} dot={{ fill: '#0969da', r: 4 }} activeDot={{ r: 6, fill: '#0969da' }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-56 flex items-center justify-center text-slate-600 text-sm">Not enough data yet</div>
+            <div className="h-56 flex items-center justify-center text-tx-tertiary text-sm">Not enough data yet</div>
           )}
         </div>
 
         {/* Severity breakdown pie */}
         <div className="glass-card p-6">
-          <h3 className="font-semibold text-white text-sm mb-5">Issue Severity Breakdown</h3>
+          <h3 className="font-semibold text-tx-primary text-sm mb-5">Issue Severity Breakdown</h3>
           {pieData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value">
                   {pieData.map((entry) => (
-                    <Cell key={entry.name} fill={COLORS[entry.name.toLowerCase()] || '#6366f1'} />
+                    <Cell key={entry.name} fill={COLORS[entry.name.toLowerCase()] || '#0969da'} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend formatter={(v) => <span className="text-slate-400 text-xs">{v}</span>} />
+                <Legend formatter={(v) => <span className="text-tx-secondary text-xs">{v}</span>} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-56 flex items-center justify-center text-slate-600 text-sm">No severity data</div>
+            <div className="h-56 flex items-center justify-center text-tx-tertiary text-sm">No severity data</div>
           )}
         </div>
       </div>
 
       {/* Top recurring mistakes */}
       <div className="glass-card p-6">
-        <h3 className="font-semibold text-white text-sm mb-5">Top Recurring Mistakes</h3>
+        <h3 className="font-semibold text-tx-primary text-sm mb-5">Top Recurring Mistakes</h3>
         {mistakesChartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={mistakesChartData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-              <XAxis type="number" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" tick={{ fill: '#94a3b8', fontSize: 10 }} width={140} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" horizontal={false} />
+              <XAxis type="number" tick={{ fill: 'var(--text-tertiary)', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="name" tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} width={140} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="count" radius={[0, 6, 6, 0]}>
                 {mistakesChartData.map((_, i) => (
@@ -187,7 +187,7 @@ export default function ProgressDashboard() {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-40 flex items-center justify-center text-slate-600 text-sm">No mistake data yet</div>
+          <div className="h-40 flex items-center justify-center text-tx-tertiary text-sm">No mistake data yet</div>
         )}
       </div>
     </div>
